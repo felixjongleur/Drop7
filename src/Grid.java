@@ -90,7 +90,6 @@ public class Grid {
 		AI.a2.start();
 		grid = new ArrayList<NumberTile>();
 
-//		g2.start();	
 		for(int pos = 0; pos < g.grid.size(); pos++) {
 			if(g.grid.get(pos) == null) {
 				grid.add(null);
@@ -101,32 +100,7 @@ public class Grid {
 				AI.a3.stop();
 				AI.t3 += AI.a3.getElapsedTime();
 			}
-			
-/*			NumberTile nt2 = null;
-			if(g.grid.get(pos) != null) {
-				NumberTile nt = g.grid.get(pos);
-
-				nt2 = new NumberTile(nt.x, nt.y, nt.value, nt.unknown);
-			}			
-			grid.add(nt2);*/
 		}
-//		g2.stop();
-//		t2+=g2.getElapsedTime();
-		/*
-		for(NumberTile nt : g.grid) {
-			g2.start();
-			NumberTile nt2 = new NumberTile(nt.x, nt.y, nt.value, nt.unknown);
-			numberOfTimes++;
-			g2.stop();
-			t2+=g2.getElapsedTime();
-			g3.start();
-			grid.add(nt2);
-			g3.stop();
-			t3+=g3.getElapsedTime();
-		}	*/	
-//		printOutBoard();
-
-//		g5.start();
 		this.level = g.level;
 		this.turnsLeft = g.turnsLeft;
 		this.currentPieceIndex = g.currentPieceIndex;
@@ -136,15 +110,6 @@ public class Grid {
 		this.currentTile = new NumberTile(g.currentTile.value, g.currentTile.unknown, g.currentTile.inHand);
 		AI.a2.stop();
 		AI.t2 += AI.a2.getElapsedTime();
-//		g5.stop();
-//		t5+= g5.getElapsedTime();
-
-//		System.out.println("T1 = " + t1);
-//		System.out.println("T2 = " + t2);
-//		System.out.println("T3 = " + t3);	
-//		System.out.println("T4 = " + t4);	
-//		System.out.println("T5 = " + t5);	
-//		System.out.println();*/
 	}
 	
 	public void loadAllNumberTiles() {
@@ -199,12 +164,13 @@ public class Grid {
 						str = scanner.next();
 						if(!str.equals("-")) {
 							int value = Integer.parseInt(str.substring(0, 1));
+							int location = getNumberTileLocation(x, y);
 							if (str.length() == 1) {
-								copyNumberTile(x, y, new NumberTile(x, y, value, 0));
+								grid.set(location, new NumberTile(x, y, value, 0));
 							} else if (str.length() == 2) {
-								copyNumberTile(x, y, new NumberTile(x, y, value, 1));
+								grid.set(location, new NumberTile(x, y, value, 1));
 							} else if (str.length() ==3) {
-								copyNumberTile(x, y, new NumberTile(x, y, value, 2));
+								grid.set(location, new NumberTile(x, y, value, 2));
 							}
 						}
 					}
@@ -233,7 +199,7 @@ public class Grid {
 				NumberTile nt = getNumberTileAtLocation(x, y);
 				if(nt != null) {
 					int location = getNumberTileLocation(x, y - 1);
-					grid.set(location, getNumberTile(x, y, nt.value, nt.unknown));				
+					grid.set(location, getNumberTile(x, y - 1, nt.value, nt.unknown));				
 				}
 			}
 			// Add In New Row
@@ -280,12 +246,17 @@ public class Grid {
 	}
 	
 	private void burnDown() {
-		
-		while (checkColumns() || checkRows()) {
+		if(MainWindow.debug)
+			printOutBoard();
+		while (checkColumns() | checkRows()) {
 			multiplier++;
 			explodeHits();
+			if(MainWindow.debug)
+				printOutBoard();
 
 			dropAllColumns();
+			if(MainWindow.debug)
+				printOutBoard();
 			
 			if(gridIsEmpty()) {
 				score += 70000;

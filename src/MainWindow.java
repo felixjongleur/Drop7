@@ -7,9 +7,12 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
+
+import javax.imageio.ImageIO;
 
 public class MainWindow extends Applet implements MouseListener, MouseMotionListener {
 
@@ -22,11 +25,14 @@ public class MainWindow extends Applet implements MouseListener, MouseMotionList
 	int width = 400; // width in # of cells
 	int height = 400; // height in # of cells
 	
-	static boolean ai = true;
-	static boolean aiLoop = true;
-	static boolean debug = true;
+	static boolean ai = false;
+	static boolean aiLoop = false;
+	static boolean debug = false;
 	static boolean newGame = true;
-	static boolean loadSequence = false;
+	static boolean loadSequence = true;
+	static boolean loadSequenceLoop = true;
+	
+	static Image blank;
 	
 	static int sequenceIndex = 0;
 	static ArrayList<Integer> sequence = new ArrayList<Integer>();
@@ -121,7 +127,7 @@ public class MainWindow extends Applet implements MouseListener, MouseMotionList
 	}
 	
 	public void doSequence() {
-		while(loadSequence && sequenceIndex < sequence.size()) {
+		if(sequenceIndex < sequence.size()) {
 			System.out.println(sequence.get(sequenceIndex));
 			System.out.println(currentGrid.currentTile);
 			System.out.println(currentGrid.currentPieceIndex);
@@ -129,6 +135,8 @@ public class MainWindow extends Applet implements MouseListener, MouseMotionList
 			sequenceIndex++;
 			currentGrid.pieceHasBeenReleased();
 			repaint();
+			if(loadSequenceLoop)
+				doSequence();
 		}
 	}
 
@@ -138,7 +146,7 @@ public class MainWindow extends Applet implements MouseListener, MouseMotionList
 				doSequence();
 			}
 			
-			if(!aiLoop)
+			if(!aiLoop && !loadSequence)
 				currentGrid.pieceHasBeenReleased();
 		//	System.out.println("Actual Board Score = " + currentGrid.score);
 		//	System.out.println("Actual Level = " + currentGrid.level);
@@ -186,14 +194,28 @@ public class MainWindow extends Applet implements MouseListener, MouseMotionList
 	public void paint(Graphics g) {
 		backg.clearRect(0, 0, width, height);
 
+		if(blank == null) {
+			try {
+				blank = ImageIO.read(new File("media", "blank.png"));
+			} catch (IOException e) { }
+		}
+		
+		for(int y = 1; y < 8; y++) {
+			for(int x = 1; x < 8; x++) {
+				backg.drawImage(blank, x * 40, y * 40, this);
+			}
+		}
+
 		for (NumberTile nt : currentGrid.grid) {
 			if(nt != null)
 				nt.paint(backg);
 		}
-		
 		if(currentGrid.currentTile != null)
 			currentGrid.currentTile.paint(backg);
 
+		backg.setColor(Color.WHITE);
+		backg.drawString("Score = " + currentGrid.score, 10, 350);
+		
 		g.drawImage(backBuffer, 0, 0, this);
 	}
 }

@@ -5,7 +5,7 @@ public class AI {
 
 	Tree<Triplet> moves;
 
-	int maxDepth = 8;
+	int maxDepth = 6;
 	static int boardNumber = 0;
 
 	static StopWatch a1 = new StopWatch();
