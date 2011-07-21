@@ -19,7 +19,6 @@ public class AIThread extends Thread {
 		bestPos = ai.getBestMove();
 		System.out.println(bestPos);
 		done = true;
-	//	System.out.println(bestPos);
     }
     
     public int getBestPos() {

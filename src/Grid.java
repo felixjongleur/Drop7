@@ -85,19 +85,13 @@ public class Grid {
 	}
 	
 	public Grid(Grid g) {
-		AI.n2++;
-		AI.a2.start();
 		grid = new ArrayList<NumberTile>();
 
 		for(int pos = 0; pos < g.grid.size(); pos++) {
 			if(g.grid.get(pos) == null) {
 				grid.add(null);
 			} else {
-				AI.n3++;
-				AI.a3.start();
 				grid.add(getNumberTile(g.grid.get(pos).x, g.grid.get(pos).y, g.grid.get(pos).value, g.grid.get(pos).unknown));
-				AI.a3.stop();
-				AI.t3 += AI.a3.getElapsedTime();
 			}
 		}
 		this.level = g.level;
@@ -107,8 +101,6 @@ public class Grid {
 		this.hits = g.hits;
 		this.score = new Integer(g.score);
 		this.currentTile = new NumberTile(g.currentTile.value, g.currentTile.unknown, g.currentTile.inHand);
-		AI.a2.stop();
-		AI.t2 += AI.a2.getElapsedTime();
 	}
 	
 	public void loadAllNumberTiles() {
