@@ -246,17 +246,17 @@ public class Grid {
 	}
 	
 	private void burnDown() {
-		if(MainWindow.debug)
-			printOutBoard();
+	//	if(MainWindow.debug)
+	//		printOutBoard();
 		while (checkColumns() | checkRows()) {
 			multiplier++;
 			explodeHits();
-			if(MainWindow.debug)
-				printOutBoard();
+		//	if(MainWindow.debug)
+			//	printOutBoard();
 
 			dropAllColumns();
-			if(MainWindow.debug)
-				printOutBoard();
+			//if(MainWindow.debug)
+				//printOutBoard();
 			
 			if(gridIsEmpty()) {
 				score += 70000;
@@ -285,13 +285,6 @@ public class Grid {
 			} else {
 				currentTile = nextFallingPiece();
 			}
-			
-			multiplier = 1;
-			if(gridIsEmpty())
-				score += 70000;
-	//		AI.n5++;
-	//		AI.a5.stop();
-	//		AI.t5 += AI.a5.getElapsedTime();
 			
 			return true;
 		}
@@ -467,6 +460,28 @@ public class Grid {
 					System.out.print("   ");
 				}
 				System.out.print("|");
+			}
+			System.out.println();
+		}
+		System.out.println();
+	}
+	
+	public void printBoardForFile() {
+		System.out.println();
+		for(int y = 1; y < 8; y++) {
+			for(int x = 1; x < 8; x++) {
+				NumberTile temp = getNumberTileAtLocation(x, y);
+				if(temp != null) {
+					if(temp.unknown == 2)
+						System.out.print(" "+temp.value+"?? ");
+					else if(temp.unknown == 1)
+						System.out.print(" "+temp.value+"?  ");
+					else
+						System.out.print(" "+temp.value+"   ");
+				} else {
+					System.out.print("  -  ");
+				}
+			//	System.out.print("|");
 			}
 			System.out.println();
 		}

@@ -5,7 +5,7 @@ public class AI {
 
 	Tree<Triplet> moves;
 
-	int maxDepth = 6;
+	int maxDepth = 9;
 	static int boardNumber = 0;
 
 	static StopWatch a1 = new StopWatch();
@@ -49,7 +49,7 @@ public class AI {
 
 		for (Node<Triplet> triplet : root.getChildren()) {
 			int score = MaxScore(triplet, 1);
-	//		if(MainWindow.debug)
+			if(MainWindow.debug)
 			System.out.println("POS => " + triplet.getData().pos + " SCORE => " + score);
 			if(score > bestScore) {
 				bestScore = score;

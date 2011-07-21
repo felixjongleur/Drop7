@@ -1,14 +1,14 @@
-#level 4
-#turnsLeft 8
-#score 546278
-#currentPieceIndex 107
-#raisingIndex 28
-
+#level 5
+#turnsLeft 4
+#score 613254
+#currentPieceIndex 136
+#raisingIndex 35
 #grid
- -   -   -   -   -   -   -
- -   -   -   -   -   -   -
- -   -   6   -   -   -   -
- -   -   2  4?  7??  -   -
- -  7?? 6?? 5??  2   -  7??
- 5  2?  7?  7?  7?? 3?? 6??
- 3  2?  7?  1?? 7?? 1?? 7??
+
+  -    -    -    -    -    -    -  
+  -    -    -    -    -    -    -  
+  -    -    -    -    -   7     -  
+  -    -    -    -    -   3    7   
+ 4??   -    -    -   2    5?   6?  
+ 7    6?    -   1??  1    1    5?? 
+ 2    6    5?   1??  5    4??  1?? 

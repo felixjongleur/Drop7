@@ -27,7 +27,7 @@ public class MainWindow extends Applet implements MouseListener, MouseMotionList
 	
 	static boolean ai = false;
 	static boolean aiLoop = false;
-	static boolean debug = false;
+	static boolean debug = true;
 	static boolean newGame = true;
 	static boolean loadSequence = true;
 	static boolean loadSequenceLoop = true;
@@ -129,8 +129,8 @@ public class MainWindow extends Applet implements MouseListener, MouseMotionList
 	public void doSequence() {
 		if(sequenceIndex < sequence.size()) {
 			System.out.println(sequence.get(sequenceIndex));
-			System.out.println(currentGrid.currentTile);
-			System.out.println(currentGrid.currentPieceIndex);
+	//		System.out.println(currentGrid.currentTile);
+	//		System.out.println(currentGrid.currentPieceIndex);
 			currentGrid.currentTile.x = sequence.get(sequenceIndex);
 			sequenceIndex++;
 			currentGrid.pieceHasBeenReleased();
@@ -138,6 +138,13 @@ public class MainWindow extends Applet implements MouseListener, MouseMotionList
 			if(loadSequenceLoop)
 				doSequence();
 		}
+		System.out.println("#level "+currentGrid.level);
+		System.out.println("#turnsLeft "+currentGrid.turnsLeft);
+		System.out.println("#score "+currentGrid.score);
+		System.out.println("#currentPieceIndex "+(currentGrid.currentPieceIndex - 1));
+		System.out.println("#raisingIndex "+currentGrid.raisingIndex);
+		System.out.println("#grid");
+		currentGrid.printBoardForFile();
 	}
 
 	public void mouseReleased(MouseEvent e) {
@@ -146,7 +153,7 @@ public class MainWindow extends Applet implements MouseListener, MouseMotionList
 				doSequence();
 			}
 			
-			if(!aiLoop && !loadSequence)
+			if(!aiLoop && !(sequenceIndex < sequence.size()))
 				currentGrid.pieceHasBeenReleased();
 		//	System.out.println("Actual Board Score = " + currentGrid.score);
 		//	System.out.println("Actual Level = " + currentGrid.level);
