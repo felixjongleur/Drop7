@@ -1,19 +1,32 @@
 
 public class MaxScoreThread extends Thread {
 
-	int maxDepth;
-	Node<Triplet> root;
+	private int maxDepth;
+	private int position;
+	private int maxScore;
+	private boolean isDone;
+	private Node<Triplet> root;
 	
 	public MaxScoreThread(Node<Triplet> root, int maxDepth) {
 		this.maxDepth = maxDepth;
 		this.root = root;
+		this.position = root.getData().pos;
 	}
 	
 	public void run() {
-		
+		if(!isDone) {
+			maxScore = maxScore(root, 1);
+			AI.getResultsFromThreads(position, maxScore);
+			isDone = true;
+		}		
+	}
+	
+	public boolean getIsDone() {
+		return isDone;
 	}
 	
 	private int maxScore(Node<Triplet> root, int depth) {
+//		root.getData().grid.printOutBoard();
 		if(depth >= maxDepth) {
 			return root.getData().score;
 		}

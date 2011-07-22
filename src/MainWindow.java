@@ -25,12 +25,12 @@ public class MainWindow extends Applet implements MouseListener, MouseMotionList
 	int width = 400; // width in # of cells
 	int height = 400; // height in # of cells
 	
-	static boolean ai = false;
+	static boolean ai = true;
 	static boolean aiLoop = false;
 	static boolean debug = true;
 	static boolean newGame = true;
-	static boolean loadSequence = true;
-	static boolean loadSequenceLoop = true;
+	static boolean loadSequence = false;
+	static boolean loadSequenceLoop = false;
 	
 	static Image blank;
 	
