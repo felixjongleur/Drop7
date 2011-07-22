@@ -11,6 +11,9 @@ public class AI {
 	private static HashMap<Integer, Integer> posAndScore;
 
 	private int maxDepth = 3;
+
+	StopWatch a1 = new StopWatch();
+	StopWatch a2 = new StopWatch();
 	
 	public AI(Grid currentGrid) {
 		posAndScore = new HashMap<Integer, Integer>();
@@ -24,6 +27,7 @@ public class AI {
 	}
 
 	private int getBestMove(Node<Triplet> root) {
+		a1.start();
 		int bestPos = 0;
 		int bestScore = 0;		
 		for (int pos = 1; pos < 8; pos++) {
@@ -61,7 +65,8 @@ public class AI {
 				bestPos = entry.getKey();
 			}
 		}
-		
+		a1.stop();
+		System.out.println("TIME = " + a1.getElapsedTime());
 		return bestPos;
 	}
 		

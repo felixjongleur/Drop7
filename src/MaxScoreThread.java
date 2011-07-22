@@ -14,11 +14,9 @@ public class MaxScoreThread extends Thread {
 	}
 	
 	public void run() {
-		if(!isDone) {
-			maxScore = maxScore(root, 1);
-			AI.getResultsFromThreads(position, maxScore);
-			isDone = true;
-		}		
+		maxScore = maxScore(root, 1);
+		AI.getResultsFromThreads(position, maxScore);
+		isDone = true;
 	}
 	
 	public boolean getIsDone() {

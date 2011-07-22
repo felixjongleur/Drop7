@@ -34,7 +34,7 @@ public class Grid {
 	
 	static long t1 = 0, t2 = 0, t3 = 0, t4 = 0, t5 = 0;
 		
-	int maxMultiplier = 24;
+	int maxMultiplier = 22;
 	
 	public Grid() throws FileNotFoundException {
 		grid = new ArrayList<NumberTile>();
@@ -118,7 +118,7 @@ public class Grid {
 		}
 	}
 	
-	public NumberTile getNumberTile(int x, int y, int value, int unknown) {
+	public static synchronized NumberTile getNumberTile(int x, int y, int value, int unknown) {
 		int posInGrid = ((x - 1) + (y - 1) * 7);
 		int offSet = posInGrid * 21;
 		int innerValue = 0;
@@ -479,13 +479,18 @@ public class Grid {
 		System.out.println();
 	}
 			
-	void addToScore() {
+	public void addToScore() {
 	//	System.out.println("Multiplier = "+multiplier);
 		if(multiplier > maxMultiplier) {
 			System.out.println("NEW HIGH MULTIPLIER FOUND " + multiplier);
-			maxMultiplier = multiplier;
+		//	maxMultiplier = multiplier;
+		} else {
+			score += getMultiplierToScore(multiplier);
 		}
-		score += Integer.parseInt(multiplierToScore.get(multiplier));
+	}
+	
+	public static synchronized int getMultiplierToScore(int multiplier) {
+		return Integer.parseInt(multiplierToScore.get(multiplier));
 	}
 	
 	private NumberTile nextFallingPiece() {
@@ -496,7 +501,7 @@ public class Grid {
 		return getPiece(rows, raisingIndex++);
 	}
 
-	private static NumberTile getPiece(ArrayList<NumberTile> list, int index) {
+	private static synchronized NumberTile getPiece(ArrayList<NumberTile> list, int index) {
 		return list.get(index);
 	}
 }
