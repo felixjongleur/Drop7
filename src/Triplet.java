@@ -8,4 +8,8 @@ public class Triplet {
         this.score = score;
         this.grid = grid;
     }
+    
+    public String toString() {
+    	return "["+pos+" , "+score+" , "+grid+"]";
+    }
 }

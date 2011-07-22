@@ -16,6 +16,7 @@ public class MaxScoreThread extends Thread {
 	public void run() {
 		maxScore = maxScore(root, 1);
 		AI.getResultsFromThreads(position, maxScore);
+		System.out.println("MAIN POS " + root.getData().pos + "\n" + root.toString());
 		isDone = true;
 	}
 	
@@ -23,30 +24,30 @@ public class MaxScoreThread extends Thread {
 		return isDone;
 	}
 	
-	private int maxScore(Node<Triplet> root, int depth) {
+	private int maxScore(Node<Triplet> node, int depth) {
 //		root.getData().grid.printOutBoard();
 		if(depth >= maxDepth) {
-			return root.getData().score;
+			return node.getData().score;
 		}
 		int maxScore = 0;
 		for (int pos = 1; pos < 8; pos++) {
-			if(root.data.grid.getNumberTileAtLocation(pos, 1) == null) {
-				Grid currentGrid = new Grid(root.data.grid);
+			if(node.data.grid.getNumberTileAtLocation(pos, 1) == null) {
+				Grid currentGrid = new Grid(node.data.grid);
 				
 				currentGrid.currentTile.x = pos;
 				currentGrid.pieceHasBeenReleased();
-				root.addChild(new Node<Triplet>(new Triplet(pos, currentGrid.score, currentGrid)));
+				node.addChild(new Node<Triplet>(new Triplet(pos, currentGrid.score, currentGrid)));
 			}
 		}
 		
-		for (Node<Triplet> triplet : root.getChildren()) {
+		for (Node<Triplet> triplet : node.getChildren()) {
 			int score = maxScore(triplet, depth + 1);						
 			if(score > maxScore)
 				maxScore = score;
 		}
 				
-		if(root.getNumberOfChildren() > 0)
-			root.children.clear();		
+	//	if(node.getNumberOfChildren() > 0)
+	//		node.children.clear();		
 		
 		return maxScore;
 	}

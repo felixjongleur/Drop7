@@ -435,26 +435,28 @@ public class Grid {
 		}
 	}
 	
-	public void printOutBoard() {
-		System.out.println();
+	public String toString() {
+		String string = "";
+		string += "\n";
 		for(int y = 1; y < 8; y++) {
 			for(int x = 1; x < 8; x++) {
 				NumberTile temp = getNumberTileAtLocation(x, y);
 				if(temp != null) {
 					if(temp.unknown == 2)
-						System.out.print(temp.value+"??");
+						string += temp.value+"??";
 					else if(temp.unknown == 1)
-						System.out.print(temp.value+"? ");
+						string += temp.value+"? ";
 					else
-						System.out.print(temp.value+"  ");
+						string += temp.value+"  ";
 				} else {
-					System.out.print("   ");
+					string += "   ";
 				}
-				System.out.print("|");
+				string += "|";
 			}
-			System.out.println();
+			string += "\n";
 		}
-		System.out.println();
+		string += "\n";
+		return string;
 	}
 	
 	public void printBoardForFile() {

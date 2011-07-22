@@ -10,7 +10,7 @@ public class AI {
 	private Tree<Triplet> moves;
 	private static HashMap<Integer, Integer> posAndScore;
 
-	private int maxDepth = 3;
+	private int maxDepth = 2;
 
 	StopWatch a1 = new StopWatch();
 	StopWatch a2 = new StopWatch();
