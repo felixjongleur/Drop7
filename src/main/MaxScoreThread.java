@@ -8,6 +8,15 @@ public class MaxScoreThread extends Thread {
 	private boolean isDone;
 	private Node<Triplet> root;
 
+	StopWatch a1 = new StopWatch();
+	StopWatch a2 = new StopWatch();
+	StopWatch a3 = new StopWatch();
+	StopWatch a4 = new StopWatch();
+	StopWatch a5 = new StopWatch();
+	StopWatch a6 = new StopWatch();
+	
+	static long t1, t2, t3, t4, t5, t6;
+	
 	public MaxScoreThread(Node<Triplet> root, int maxDepth) {
 		this.maxDepth = maxDepth;
 		this.root = root;
@@ -28,11 +37,12 @@ public class MaxScoreThread extends Thread {
 	}
 
 	private int maxScore(Node<Triplet> node, int depth) {
-		// root.getData().grid.printOutBoard();
-		if (depth >= maxDepth) {
+		if (depth >= maxDepth)
 			return node.getData().score;
-		}
-		int maxScore = 0;
+		
+		int maxScore = 0;		
+		
+		a1.start();
 		for (int pos = 1; pos < 8; pos++) {
 			if (node.data.grid.getNumberTileAtLocation(pos, 1) == null) {
 				Board currentGrid = new Board(node.data.grid);
@@ -44,6 +54,8 @@ public class MaxScoreThread extends Thread {
 				}
 			}
 		}
+		a1.stop();
+		t1 += a1.getElapsedTime();
 
 		for (Node<Triplet> triplet : node.getChildren()) {
 			int score = maxScore(triplet, depth + 1);
@@ -53,7 +65,7 @@ public class MaxScoreThread extends Thread {
 
 		if (node.getNumberOfChildren() > 0)
 			node.children.clear();
-
+		
 		return maxScore;
 	}
 }

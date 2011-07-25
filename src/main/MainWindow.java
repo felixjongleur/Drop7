@@ -10,15 +10,13 @@ import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 
 public class MainWindow extends Applet implements MouseListener,
 		MouseMotionListener {
+
+	private static final long serialVersionUID = -2776426312459574519L;
 
 	private Image backBuffer;
 
@@ -29,6 +27,7 @@ public class MainWindow extends Applet implements MouseListener,
 	private int width = 400; // width in # of cells
 	private int height = 400; // height in # of cells
 
+	static int maxDepth = 8;
 	private boolean ai = true;
 	private boolean aiLoop = true;
 	private boolean newGame = true;
@@ -36,15 +35,11 @@ public class MainWindow extends Applet implements MouseListener,
 	private String loadFileName = "";
 	private boolean loadSequenceLoop = false;
 
-	private static boolean debug = true;
-
 	private static Image blank;
 
 	private AIThread aiThread;
 
 	private Board currentGrid;
-
-	private boolean done = false;
 
 	@Override
 	public void init() {
@@ -60,7 +55,7 @@ public class MainWindow extends Applet implements MouseListener,
 		backg = backBuffer.getGraphics();
 
 		try {
-			currentGrid = new Board(newGame, loadSequence, loadFileName);
+			currentGrid = new Board(newGame, loadSequence, loadSequenceLoop, loadFileName);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}

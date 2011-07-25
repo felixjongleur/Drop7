@@ -29,24 +29,27 @@ public class BoardTest {
 		// 21 Tiles per each of the 49 Squares
 		assertEquals(1029, Board.getAllNumberTiles().size());
 		
-		board = new Board(true, true, "sequence9.txt");
+		board = new Board(true, true, true, "sequence9.txt");
 		assertNotNull(Board.getSequence());
 	}
 	
 	@Test
 	public void testBoard() throws FileNotFoundException {		
-		assertEquals(49, board.getGrid().size());
+		//assertEquals(49, board.getGrid().size());
+		assertEquals(49, board.getGrid().length);
 		
 		// First 6 Rows are empty
 		for(int pos = 0; pos < 42; pos++)
-			assertNull(board.getGrid().get(pos));
+			assertNull(board.getGrid()[pos]);
+			//assertNull(board.getGrid().get(pos));
 		
 		// Last Row contains 7 tiles
 		for(int pos = 42; pos < 49; pos++)
-			assertNotNull(board.getGrid().get(pos));
+			assertNotNull(board.getGrid()[pos]);
+		//	assertNotNull(board.getGrid().get(pos));
 
-		for(boolean hit : board.getHits())
-			assertFalse(hit);
+	//	for(boolean hit : board.getHits())
+	//		assertFalse(hit);
 	}
 	
 	@Test
@@ -54,6 +57,7 @@ public class BoardTest {
 		Board b = new Board(board);		
 		assertNotSame(b, board);
 		assertNotSame(b.getGrid(), board.getGrid());
+		assertNotSame(b.getCurrentTile(), board.getCurrentTile());
 	}
 	
 	@Test
@@ -836,9 +840,7 @@ public class BoardTest {
 		assertEquals(unknownUp1, unknownUp2 - 1);
 		assertEquals(unknownDown1, unknownDown2 - 1);
 		assertEquals(unknownLeft1, unknownLeft2 - 1);
-		assertEquals(unknownRight1, unknownRight2 - 1);
-		
-		b.printBoardForFile();
+		assertEquals(unknownRight1, unknownRight2 - 1);		
 	}
 	
 	@Test
@@ -901,7 +903,53 @@ public class BoardTest {
 		assertTrue(b.gridIsEmpty());
 	}
 	
-	
+	@Test
+	public void testPieceHasBeenReleased() {
+				
+		Board b = new Board(board);
+		int turnsLeft = b.getTurnsLeft();
+		int score = b.getScore();
+		
+		assertEquals(30, turnsLeft);
+		assertEquals(0, score);
+		assertNotNull(b.getCurrentTile());
+		assertEquals(2, b.getCurrentTile().getValue());
+		assertEquals(0, b.getCurrentTile().getUnknown());
+
+		// -   -   -   2   -   -   -
+		// -
+		// -
+		// -
+		// -
+		// -
+		// 6?? 4?? 5?? 7?? 5?? 1?? 3??
+		b.getCurrentTile().setX(4);
+		b.pieceHasBeenReleased();
+		assertEquals(b.getTurnsLeft(), turnsLeft - 1);
+		assertEquals(b.getScore(), score + 7);
+		assertNotNull(b.getCurrentTile());
+		assertEquals(1, b.getCurrentTile().getValue());
+		assertEquals(0, b.getCurrentTile().getUnknown());
+		// -   -   -   1   -   -   -
+		// -
+		// -
+		// -
+		// -
+		// -
+		// 6?? 4?? 5?? 7? 5?? 1?? 3??
+		b.getCurrentTile().setX(4);
+		b.pieceHasBeenReleased();
+		assertEquals(b.getTurnsLeft(), turnsLeft - 2);
+		assertEquals(b.getScore(), score + 7 + 7 + 39);
+		assertNotNull(b.getCurrentTile());
+		// -   -   -   -   -   -   -
+		// -
+		// -
+		// -
+		// -
+		// -
+		// 6?? 4?? 5?? -  5?? 1?? 3??
+	}
 	
 	private void createColumns(int num, int value, Board b) {
 		for(int x = 1; x <= num; x++) {
@@ -912,8 +960,12 @@ public class BoardTest {
 	}
 	
 	private void clearBoard(Board b) {
-		for(int y = 1; y < 8; y++)
+		for(int pos = 0; pos < b.getGrid().length; pos++) {
+			b.getGrid()[pos] = null;
+		}
+		
+/*		for(int y = 1; y < 8; y++)
 			for(int x = 1; x < 8; x++)
-				b.getGrid().set(b.getNumberTileLocation(x, y), null);
+				b.getGrid().set(b.getNumberTileLocation(x, y), null);*/
 	}
 }
