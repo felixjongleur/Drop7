@@ -33,6 +33,7 @@ public class MainWindow extends Applet implements MouseListener,
 	private boolean aiLoop = true;
 	private boolean newGame = true;
 	private boolean loadSequence = false;
+	private String loadFileName = "";
 	private boolean loadSequenceLoop = false;
 
 	private static boolean debug = true;
@@ -59,7 +60,7 @@ public class MainWindow extends Applet implements MouseListener,
 		backg = backBuffer.getGraphics();
 
 		try {
-			currentGrid = new Board(newGame, loadSequence);
+			currentGrid = new Board(newGame, loadSequence, loadFileName);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}

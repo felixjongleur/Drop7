@@ -11,7 +11,8 @@ public class AI {
 	private Tree<Triplet> moves;
 	private static HashMap<Integer, Integer> posAndScore;
 
-	private int maxDepth = 6;
+	private int maxDepth = 10;
+	static private int numOfThreads = 0;
 	static int getResultsFromThread = 0;
 
 	StopWatch a1 = new StopWatch();
@@ -50,6 +51,7 @@ public class AI {
 		for (Node<Triplet> triplet : root.getChildren()) {
 			MaxScoreThread mst = new MaxScoreThread(triplet, maxDepth);
 			threads.add(mst);
+			numOfThreads++;
 			mst.start();
 		}
 
@@ -84,6 +86,7 @@ public class AI {
 
 	static synchronized void getResultsFromThreads(int position, int score) {
 		getResultsFromThread++;
+		numOfThreads--;
 		posAndScore.put(position, score);
 	}
 }

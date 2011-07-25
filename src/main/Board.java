@@ -11,7 +11,7 @@ import java.util.Scanner;
 
 public class Board {
 
-	private int level = 1;
+	private int level = 0;
 	private int turnsLeft = 0;
 	private int score = 0;
 
@@ -45,10 +45,10 @@ public class Board {
 	private int maxMultiplier = 22;
 
 	public Board() throws FileNotFoundException {
-		this(true, false);
+		this(true, false, "");
 	}
 	
-	public Board(boolean newGame, boolean loadSequence)
+	public Board(boolean newGame, boolean loadSequence, String loadFileName)
 			throws FileNotFoundException {
 		grid = new ArrayList<NumberTile>();
 
@@ -103,7 +103,7 @@ public class Board {
 				g.currentTile.getUnknown(), g.currentTile.isInHand());
 	}
 
-	public void loadSequence(String fileName) throws FileNotFoundException {
+	private void loadSequence(String fileName) throws FileNotFoundException {
 		Scanner scanner = new Scanner(new File("files", fileName));
 		while (scanner.hasNext()) {
 			String str = scanner.next();
@@ -114,7 +114,7 @@ public class Board {
 		sequenceLoaded = true;
 	}
 
-	public void loadAllNumberTiles() {
+	private void loadAllNumberTiles() {
 		Map<Integer, NumberTile> temp = new HashMap<Integer, NumberTile>();
 		int pos = 0;
 		for (int y = 1; y < 8; y++) {
@@ -130,6 +130,57 @@ public class Board {
 		allNumberTiles = Collections.unmodifiableMap(temp);
 	}
 
+	private void loadMultiplierToScore() throws FileNotFoundException {
+		Map<Integer, Integer> temp = new HashMap<Integer, Integer>();
+
+		Scanner scanner = new Scanner(new File("files", "chainScores.txt"));
+		int pos = 1;
+		while (scanner.hasNext()) {
+			temp.put(pos++, scanner.nextInt());
+		}
+		multiplierToScore = Collections.unmodifiableMap(temp);
+	}
+
+	private void loadUserPieces() throws FileNotFoundException {
+		List<NumberTile> temp = new ArrayList<NumberTile>();
+
+		Scanner scanner = new Scanner(new File("files", "userPieces.txt"));
+		String str;
+		while (scanner.hasNext()) {
+			str = scanner.next();
+			if (str.length() == 1) {
+				temp.add(new NumberTile(Integer.parseInt(str), 0, true));
+			} else if (str.length() > 1) {
+				temp.add(new NumberTile(Integer.parseInt(str.substring(0, 1)),
+						2, true));
+			}
+		}
+		userPieces = Collections.unmodifiableList(temp);
+		System.out.println(userPieces.size());
+	}
+
+	private void loadLevelRows() throws FileNotFoundException {
+		List<NumberTile> temp = new ArrayList<NumberTile>();
+
+		Scanner scanner = new Scanner(new File("files", "rows.txt"));
+
+		String str;
+		while (scanner.hasNext()) {
+			str = scanner.next();
+			temp.add(new NumberTile(Integer.parseInt(str.substring(0, 1)), 2,
+					true));
+		}
+		rows = Collections.unmodifiableList(temp);
+	}
+	
+	public void setNumberTile(int x, int y, int value, int unknown) {
+		grid.set(getNumberTileLocation(x, y), getNumberTile(x, y, value, unknown));
+	}
+	
+	public boolean getHitAt(int x, int y) {
+		return hits.get(getNumberTileLocation(x, y));
+	}
+	
 	public NumberTile getNumberTile(int x, int y, int value, int unknown) {
 		int posInGrid = ((x - 1) + (y - 1) * 7);
 		int offSet = posInGrid * 21;
@@ -195,7 +246,8 @@ public class Board {
 	}
 
 	public boolean levelUp() {
-
+		level++;
+		
 		for (int x = 1; x < 8; x++) {
 			// Check Top Row For Openings
 			if (getNumberTileAtLocation(x, 1) != null)
@@ -225,65 +277,15 @@ public class Board {
 		return true;
 	}
 
-	private void loadMultiplierToScore() throws FileNotFoundException {
-		Map<Integer, Integer> temp = new HashMap<Integer, Integer>();
-
-		Scanner scanner = new Scanner(new File("files", "chainScores.txt"));
-		int pos = 1;
-		while (scanner.hasNext()) {
-			temp.put(pos++, scanner.nextInt());
-		}
-		multiplierToScore = Collections.unmodifiableMap(temp);
-	}
-
-	private void loadUserPieces() throws FileNotFoundException {
-		List<NumberTile> temp = new ArrayList<NumberTile>();
-
-		Scanner scanner = new Scanner(new File("files", "userPieces.txt"));
-		String str;
-		while (scanner.hasNext()) {
-			str = scanner.next();
-			if (str.length() == 1) {
-				temp.add(new NumberTile(Integer.parseInt(str), 0, true));
-			} else if (str.length() > 1) {
-				temp.add(new NumberTile(Integer.parseInt(str.substring(0, 1)),
-						2, true));
-			}
-		}
-		userPieces = Collections.unmodifiableList(temp);
-		System.out.println(userPieces.size());
-	}
-
-	private void loadLevelRows() throws FileNotFoundException {
-		List<NumberTile> temp = new ArrayList<NumberTile>();
-
-		Scanner scanner = new Scanner(new File("files", "rows.txt"));
-
-		String str;
-		while (scanner.hasNext()) {
-			str = scanner.next();
-			temp.add(new NumberTile(Integer.parseInt(str.substring(0, 1)), 2,
-					true));
-		}
-		rows = Collections.unmodifiableList(temp);
-	}
-
-	private void burnDown() {
-		// if(MainWindow.debug)
-		// printOutBoard();
+	public void burnDown() {
 		while (checkColumns() | checkRows()) {
 			multiplier++;
 			explodeHits();
-			// if(MainWindow.debug)
-			// printOutBoard();
-
+	//		printBoardForFile();
 			dropAllColumns();
-			// if(MainWindow.debug)
-			// printOutBoard();
 
-			if (gridIsEmpty()) {
+			if (gridIsEmpty())
 				score += 70000;
-			}
 		}
 	}
 
@@ -303,16 +305,14 @@ public class Board {
 			printBoardForFile();
 		}
 	}
-
+	
 	public boolean pieceHasBeenReleased() {
 		if (sequenceLoaded)
 			doSequence();
 
 		if (getNumberTileAtLocation(currentTile.getX(), 1) == null) {
 			int x = currentTile.getX();
-			int location = getNumberTileLocation(x, 1);
-			grid.set(location, getNumberTile(x, 1, currentTile.getValue(),
-					currentTile.getUnknown()));
+			setNumberTile(x, 1, currentTile.getValue(), currentTile.getUnknown());
 
 			turnsLeft--;
 			currentTile = null;
@@ -323,7 +323,6 @@ public class Board {
 
 			if (turnsLeft == 0) {
 				score += 7000;
-				level++;
 				if (!levelUp())
 					return false;
 			} else {
@@ -351,7 +350,7 @@ public class Board {
 		return ((x - 1) + (y - 1) * 7);
 	}
 
-	private void explodeHits() {
+	public void explodeHits() {
 		for (int y = 1; y < 8; ++y) {
 			for (int x = 1; x < 8; ++x) {
 				int location = getNumberTileLocation(x, y);
@@ -362,45 +361,33 @@ public class Board {
 					// Check Up
 					if (y > 1) {
 						NumberTile nt = getNumberTileAtLocation(x, y - 1);
-						if (nt != null && nt.getUnknown() > 0) {
-							int location2 = getNumberTileLocation(x, y - 1);
-							grid.set(location2, getNumberTile(x, y - 1,
-									nt.getValue(), nt.getUnknown() - 1));
-						}
+						if (nt != null && nt.getUnknown() > 0)							
+							setNumberTile(x, y - 1, nt.getValue(), nt.getUnknown() - 1);
 					}
 					// Check Down
 					if (y < 7) {
 						NumberTile nt = getNumberTileAtLocation(x, y + 1);
-						if (nt != null && nt.getUnknown() > 0) {
-							int location2 = getNumberTileLocation(x, y + 1);
-							grid.set(location2, getNumberTile(x, y + 1,
-									nt.getValue(), nt.getUnknown() - 1));
-						}
+						if (nt != null && nt.getUnknown() > 0)
+							setNumberTile(x, y + 1, nt.getValue(), nt.getUnknown() - 1);
 					}
 					// Check Left
 					if (x > 1) {
 						NumberTile nt = getNumberTileAtLocation(x - 1, y);
-						if (nt != null && nt.getUnknown() > 0) {
-							int location2 = getNumberTileLocation(x - 1, y);
-							grid.set(location2, getNumberTile(x - 1, y,
-									nt.getValue(), nt.getUnknown() - 1));
-						}
+						if (nt != null && nt.getUnknown() > 0)
+							setNumberTile(x - 1, y, nt.getValue(), nt.getUnknown() - 1);
 					}
 					// Check Right
 					if (x < 7) {
 						NumberTile nt = getNumberTileAtLocation(x + 1, y);
-						if (nt != null && nt.getUnknown() > 0) {
-							int location2 = getNumberTileLocation(x + 1, y);
-							grid.set(location2, getNumberTile(x + 1, y,
-									nt.getValue(), nt.getUnknown() - 1));
-						}
+						if (nt != null && nt.getUnknown() > 0)
+							setNumberTile(x + 1, y, nt.getValue(), nt.getUnknown() - 1);
 					}
 				}
 			}
 		}
 	}
 
-	private boolean checkColumns() {
+	public boolean checkColumns() {
 		boolean hit = false;
 		for (int x = 1; x < 8; x++) {
 			int numberOfTilesInColumn = 0;
@@ -409,9 +396,6 @@ public class Board {
 					numberOfTilesInColumn++;
 				}
 			}
-
-			// System.out.println("Number of Tiles in Column["+x+"]= " +
-			// numberOfTilesInColumn);
 
 			for (int y = 1; y < 8; y++) {
 				NumberTile temp = getNumberTileAtLocation(x, y);
@@ -425,7 +409,7 @@ public class Board {
 		return hit;
 	}
 
-	private boolean checkRows() {
+	public boolean checkRows() {
 		boolean hit = false;
 		for (int y = 7; y > 0; y--) {
 			int numberOfTiles = 0;
@@ -466,7 +450,7 @@ public class Board {
 		return hit;
 	}
 
-	private void dropColumn(int x) {
+	public void dropColumn(int x) {
 		// printOutBoard();
 
 		int y1 = 7;
@@ -554,8 +538,36 @@ public class Board {
 		}
 	}
 
+	public int getMultiplierToScore(int multiplier) {
+		return multiplierToScore.get(multiplier);
+	}
+
+	private NumberTile nextFallingPiece() {
+		return getNumberTile(userPieces, currentPieceIndex++);
+	}
+
+	private NumberTile nextRaisingPiece() {
+		return getNumberTile(rows, raisingIndex++);
+	}
+
+	private int nextSequenceColumn() {
+		return getColumn(sequence, sequenceIndex++);
+	}
+	
+	private NumberTile getNumberTile(List<NumberTile> list, int index) {
+		return list.get(index);
+	}
+
+	private int getColumn(List<Integer> list, int index) {
+		return list.get(index);
+	}
+
 	public NumberTile getCurrentTile() {
 		return currentTile;
+	}
+	
+	public void setCurrentTile(NumberTile currentTile) {
+		this.currentTile = currentTile;
 	}
 
 	public int getScore() {
@@ -564,30 +576,6 @@ public class Board {
 
 	public List<NumberTile> getGrid() {
 		return grid;
-	}
-
-	public int getMultiplierToScore(int multiplier) {
-		return multiplierToScore.get(multiplier);
-	}
-
-	private NumberTile nextFallingPiece() {
-		return getPiece(userPieces, currentPieceIndex++);
-	}
-
-	private NumberTile nextRaisingPiece() {
-		return getPiece(rows, raisingIndex++);
-	}
-
-	private NumberTile getPiece(List<NumberTile> list, int index) {
-		return list.get(index);
-	}
-
-	private int nextSequenceColumn() {
-		return getPiece(sequence, sequenceIndex++);
-	}
-
-	private int getPiece(List<Integer> list, int index) {
-		return list.get(index);
 	}
 	
 	public List<Boolean> getHits() {
@@ -606,6 +594,10 @@ public class Board {
 		return multiplier;
 	}
 
+	public void setMultiplier(int m) {
+		multiplier = m;
+	}
+	
 	public int getCurrentPieceIndex() {
 		return currentPieceIndex;
 	}
