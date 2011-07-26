@@ -27,13 +27,13 @@ public class MainWindow extends Applet implements MouseListener,
 	private int width = 400; // width in # of cells
 	private int height = 400; // height in # of cells
 
-	static int maxDepth = 9;
+	static int maxDepth = 10;
 	private boolean ai = false;
 	private boolean aiLoop = false;
 	private boolean newGame = true;
-	private boolean loadSequence = true;
+	private boolean loadSequence = false;
 	private String loadFileName = "firstSequence91.txt";
-	private boolean loadSequenceLoop = true;
+	private boolean loadSequenceLoop = false;
 
 	private static Image blank;
 
