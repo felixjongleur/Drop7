@@ -1,0 +1,14 @@
+#level 5
+#turnsLeft 1
+#score 779523
+#currentPieceIndex 139
+#raisingIndex 35
+#grid
+
+  -    -    -    -    -    -    -  
+  -    -    -    -    -    -    -  
+  -    -    -    -    -    -    -  
+  -    -    -    -    -    -    -  
+  -    -    -    -    -    -    -  
+  -    -    -    -    -    -    -  
+  -   3??   -    -    -    -    -  

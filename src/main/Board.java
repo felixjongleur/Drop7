@@ -25,7 +25,7 @@ public class Board {
 	static List<NumberTile> rows;
 
 
-	static List<Integer> sequence = new ArrayList<Integer>();
+	static List<Integer> sequence;
 	static Map<Integer, Integer> multiplierToScore;
 	static Map<Integer, NumberTile> allNumberTiles;
 
@@ -127,13 +127,15 @@ public class Board {
 	}
 
 	private void loadSequence(String fileName, boolean sequenceLoop) throws FileNotFoundException {
+		List<Integer> temp = new ArrayList<Integer>();
 		Scanner scanner = new Scanner(new File("files", fileName));
 		while (scanner.hasNext()) {
 			String str = scanner.next();
 			if (str.length() == 1) {
-				sequence.add(Integer.parseInt(str));
+				temp.add(Integer.parseInt(str));
 			}
 		}
+		sequence = Collections.unmodifiableList(temp);
 		sequenceLoaded = true;
 		this.sequenceLoop = sequenceLoop;
 	}
@@ -180,7 +182,7 @@ public class Board {
 			}
 		}
 		userPieces = Collections.unmodifiableList(temp);
-		System.out.println(userPieces.size());
+//		System.out.println(userPieces.size());
 	}
 
 	private void loadLevelRows() throws FileNotFoundException {
@@ -230,7 +232,7 @@ public class Board {
 	}
 
 	public void loadLevel() throws FileNotFoundException {
-		Scanner scanner = new Scanner(new File("files", "depth9.txt"));
+		Scanner scanner = new Scanner(new File("files", "depth92.txt"));
 		String str;
 		while (scanner.hasNext()) {
 			str = scanner.next();
@@ -361,7 +363,7 @@ public class Board {
 				currentTile = nextFallingPiece();
 			}
 
-			if(sequenceLoop)
+			if(sequenceLoop && sequenceIndex < sequence.size())
 				pieceHasBeenReleased();
 			
 			return true;
@@ -579,12 +581,12 @@ public class Board {
 
 	public void addToScore() {
 		// System.out.println("Multiplier = "+multiplier);
-		if (multiplier > maxMultiplier) {
+		if (multiplier > maxMultiplier)// {
 			System.out.println("NEW HIGH MULTIPLIER FOUND " + multiplier);
 			// maxMultiplier = multiplier;
-		} else {
+	//	} else {
 			score += getMultiplierToScore(multiplier);
-		}
+	//	}
 	}
 
 	public int getMultiplierToScore(int multiplier) {

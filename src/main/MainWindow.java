@@ -27,13 +27,13 @@ public class MainWindow extends Applet implements MouseListener,
 	private int width = 400; // width in # of cells
 	private int height = 400; // height in # of cells
 
-	static int maxDepth = 8;
-	private boolean ai = true;
-	private boolean aiLoop = true;
+	static int maxDepth = 9;
+	private boolean ai = false;
+	private boolean aiLoop = false;
 	private boolean newGame = true;
-	private boolean loadSequence = false;
-	private String loadFileName = "";
-	private boolean loadSequenceLoop = false;
+	private boolean loadSequence = true;
+	private String loadFileName = "firstSequence91.txt";
+	private boolean loadSequenceLoop = true;
 
 	private static Image blank;
 
@@ -70,7 +70,7 @@ public class MainWindow extends Applet implements MouseListener,
 
 		repaint();
 
-		if (ai) {
+		if (ai && !aiLoop) {
 			aiThread = new AIThread(currentGrid);
 			aiThread.start();
 		}
@@ -169,8 +169,14 @@ public class MainWindow extends Applet implements MouseListener,
 			currentGrid.getCurrentTile().paint(backg);
 
 		backg.setColor(Color.WHITE);
-		backg.drawString("Score = " + currentGrid.getScore(), 10, 350);
-
+		backg.drawString("LEVEL " + currentGrid.getLevel(), 25, 375);
+		backg.drawString("SCORE " + currentGrid.getScore(), 275, 375);
+		
+		for(int pos = 0; pos < currentGrid.getTurnsLeft(); pos++) {
+			backg.fillRect(40 + (pos * 9), 325, 6, 6);
+		}
+		
+		
 		g.drawImage(backBuffer, 0, 0, this);
 	}
 }

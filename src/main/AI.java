@@ -14,6 +14,8 @@ public class AI {
 	static private int numOfThreads = 0;
 	static int getResultsFromThread = 0;
 
+	StopWatch a1 = new StopWatch();
+	
 	static int counter = 0;
 
 	public AI(Board currentGrid) {
@@ -29,6 +31,7 @@ public class AI {
 	}
 
 	private int getBestMove(Node<Triplet> root) {
+		a1.start();
 		int bestPos = 0;
 		int bestScore = 0;
 		for (int pos = 1; pos < 8; pos++) {
@@ -63,20 +66,21 @@ public class AI {
 		}
 
 		for (Entry<Integer, Integer> entry : posAndScore.entrySet()) {
-			System.out.println("POS[" + entry.getKey() + "] => "
-					+ entry.getValue());
+//			System.out.println("POS[" + entry.getKey() + "] => "
+//					+ entry.getValue());
 			if (entry.getValue() > bestScore) {
 				bestScore = entry.getValue();
 				bestPos = entry.getKey();
 			}
 		}
+		a1.stop();
 		counter++;
-		System.out.println("T1 = " + MaxScoreThread.t1 + " / " + counter + " = " + (MaxScoreThread.t1 / counter));
+/*		System.out.println("T1 = " + a1.getElapsedTime());
 		System.out.println("T1 = " + Board.t1 + " / " + Board.n1 + " = " + (Board.t1 / Board.n1));
 		System.out.println("T2 = " + Board.t2 + " / " + Board.n2 + " = " + (Board.t2 / Board.n2));
 		System.out.println("T3 = " + Board.t3 + " / " + Board.n3 + " = " + (Board.t3 / Board.n3));
 		System.out.println("T4 = " + Board.t4 + " / " + Board.n4 + " = " + (Board.t4 / Board.n4));
-		System.out.println("T5 = " + Board.t5);
+		System.out.println("T5 = " + Board.t5);*/
 		
 		return bestPos;
 	}
