@@ -27,13 +27,14 @@ public class MainWindow extends Applet implements MouseListener,
 	private int width = 400; // width in # of cells
 	private int height = 400; // height in # of cells
 
-	static int maxDepth = 10;
-	private boolean ai = false;
-	private boolean aiLoop = false;
+	static int maxDepth = 7;
+	private boolean ai = true;
+	private boolean aiLoop = true;
 	private boolean newGame = true;
 	private boolean loadSequence = false;
 	private String loadFileName = "firstSequence91.txt";
 	private boolean loadSequenceLoop = false;
+	static boolean debug = false;
 
 	private static Image blank;
 
@@ -114,14 +115,18 @@ public class MainWindow extends Applet implements MouseListener,
 
 			while (aiLoop) {
 				if (aiThread.done) {
-					aiThread = new AIThread(currentGrid);
-					aiThread.start();
-				}
-				if (aiThread.getBestPos() != 0) {
+					
 					currentGrid.getCurrentTile().setX(aiThread.getBestPos());
 					currentGrid.pieceHasBeenReleased();
-					repaint();
-					aiThread.done = true;
+					
+					if(currentGrid.getLevel() == 2) {
+						aiLoop = false;
+						currentGrid.printBoardForFile();
+						System.out.println("AI COUNTER = " + AI.counter);
+					}
+					
+					aiThread = new AIThread(currentGrid);
+					aiThread.start();
 				}
 			}
 		}

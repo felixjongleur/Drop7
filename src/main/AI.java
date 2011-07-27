@@ -17,6 +17,7 @@ public class AI {
 	StopWatch a1 = new StopWatch();
 	
 	static int counter = 0;
+	static long t1 = 0;
 
 	public AI(Board currentGrid) {
 		posAndScore = new HashMap<Integer, Integer>();
@@ -66,22 +67,24 @@ public class AI {
 		}
 
 		for (Entry<Integer, Integer> entry : posAndScore.entrySet()) {
-//			System.out.println("POS[" + entry.getKey() + "] => "
-//					+ entry.getValue());
+			if(MainWindow.debug)
+			System.out.println("POS[" + entry.getKey() + "] => " + entry.getValue());
 			if (entry.getValue() > bestScore) {
 				bestScore = entry.getValue();
 				bestPos = entry.getKey();
 			}
 		}
 		a1.stop();
+		t1 += a1.getElapsedTime();
 		counter++;
-/*		System.out.println("T1 = " + a1.getElapsedTime());
-		System.out.println("T1 = " + Board.t1 + " / " + Board.n1 + " = " + (Board.t1 / Board.n1));
-		System.out.println("T2 = " + Board.t2 + " / " + Board.n2 + " = " + (Board.t2 / Board.n2));
-		System.out.println("T3 = " + Board.t3 + " / " + Board.n3 + " = " + (Board.t3 / Board.n3));
-		System.out.println("T4 = " + Board.t4 + " / " + Board.n4 + " = " + (Board.t4 / Board.n4));
-		System.out.println("T5 = " + Board.t5);*/
-		
+		if(MainWindow.debug) {
+			System.out.println("T1 = " + t1 + " / " + counter + " = " + (t1 / counter));
+			System.out.println("T1 = " + Board.t1 + " / " + Board.n1 + " = " + (Board.t1 / Board.n1));
+			System.out.println("T2 = " + Board.t2 + " / " + Board.n2 + " = " + (Board.t2 / Board.n2));
+			System.out.println("T3 = " + Board.t3 + " / " + Board.n3 + " = " + (Board.t3 / Board.n3));
+			System.out.println("T4 = " + Board.t4 + " / " + Board.n4 + " = " + (Board.t4 / Board.n4));
+			System.out.println("T5 = " + Board.t5);
+		}
 		return bestPos;
 	}
 

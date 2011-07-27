@@ -33,8 +33,8 @@ public class Board {
 	private boolean sequenceLoop = false;
 
 	private Boolean[] hits;
-	//private List<NumberTile> grid;
-	private NumberTile[] grid2;
+	private List<NumberTile> grid;
+	//private NumberTile[] grid;
 	
 	StopWatch g1 = new StopWatch();
 	StopWatch g2 = new StopWatch();
@@ -53,16 +53,16 @@ public class Board {
 	
 	public Board(boolean newGame, boolean loadSequence, boolean sequenceLoop, String loadFileName)
 			throws FileNotFoundException {
-	//	grid = new ArrayList<NumberTile>();
-		grid2 = new NumberTile[49];
+		grid = new ArrayList<NumberTile>();
+	//	grid = new NumberTile[49];
 		hits = new Boolean[49];
-	/*	
+		
 		for (int y = 1; y < 8; y++) {
 			for (int x = 1; x < 8; x++) {
 				grid.add(null);
 			}
 		}
-	 */
+	 
 		if (userPieces == null)
 			loadUserPieces();
 		if (rows == null)
@@ -82,20 +82,20 @@ public class Board {
 
 	public Board(Board g) {
 		g1.start();
-	//	grid = new ArrayList<NumberTile>();
-		grid2 = new NumberTile[49];
+		grid = new ArrayList<NumberTile>();
+	//	grid = new NumberTile[49];
 		g1.stop();
 		n1++;
 		t1 += g1.getElapsedTime();
 		
 		g2.start();
-		for(int pos = 0; pos < 49; pos++) {
+	/*	for(int pos = 0; pos < 49; pos++) {
 			if(g.getGrid()[pos] != null) {
 				getGrid()[pos] = getNumberTile(g.getGrid()[pos].getX(), g.getGrid()[pos].getY(),
 						g.getGrid()[pos].getValue(), g.getGrid()[pos].getUnknown());
 			}
-		}		
-		/*
+		}	*/	
+		
 		for (int pos = 0; pos < g.grid.size(); pos++) {
 			if (g.grid.get(pos) == null) {
 				grid.add(null);
@@ -103,7 +103,7 @@ public class Board {
 				grid.add(getNumberTile(g.grid.get(pos).getX(), g.grid.get(pos).getY(),
 						g.grid.get(pos).getValue(), g.grid.get(pos).getUnknown()));
 			}
-		}*/
+		}
 		g2.stop();
 		n2++;
 		t2 += g2.getElapsedTime();
@@ -200,11 +200,14 @@ public class Board {
 	}
 	
 	public void setNumberTile(int x, int y, int value, int unknown) {
-		if(value == 0)
-			grid2[getNumberTileLocation(x, y)] = null;
+	/*	if(value == 0)
+			grid[getNumberTileLocation(x, y)] = null;
 		else
-			grid2[getNumberTileLocation(x, y)] = getNumberTile(x, y, value, unknown);
-		//grid.set(getNumberTileLocation(x, y), getNumberTile(x, y, value, unknown));
+			grid[getNumberTileLocation(x, y)] = getNumberTile(x, y, value, unknown);*/
+		if(value == 0)
+			grid.set(getNumberTileLocation(x, y), null);
+		else
+			grid.set(getNumberTileLocation(x, y), getNumberTile(x, y, value, unknown));
 	}
 	
 	public boolean getHitAt(int x, int y) {
@@ -372,22 +375,22 @@ public class Board {
 	}
 
 	public boolean gridIsEmpty() {
-		for(int pos = 0; pos < grid2.length; pos++) {
-			if(grid2[pos] != null)
-				return false;
-		}
-		return true;
-		
-/*		for (NumberTile nt : grid) {
-			if (nt != null)
+	/*	for(int pos = 0; pos < grid.length; pos++) {
+			if(grid[pos] != null)
 				return false;
 		}
 		return true;*/
+		
+		for (NumberTile nt : grid) {
+			if (nt != null)
+				return false;
+		}
+		return true;
 	}
 
 	public NumberTile getNumberTileAtLocation(int x, int y) {
-		return grid2[(x - 1) + (y - 1) * 7];
-		//return grid.get((x - 1) + (y - 1) * 7);
+	//	return grid[(x - 1) + (y - 1) * 7];
+		return grid.get((x - 1) + (y - 1) * 7);
 	}
 
 	public int getNumberTileLocation(int x, int y) {
@@ -402,8 +405,8 @@ public class Board {
 				//if (hits.get(location)) {
 					//hits.set(location, false);
 					hits[location] = null;
-					grid2[location] = null;
-					//grid.set(location, null);
+				//	grid[location] = null;
+					grid.set(location, null);
 					addToScore();
 					// Check Up
 					if (y > 1) {
@@ -625,9 +628,9 @@ public class Board {
 		return score;
 	}
 
-	public NumberTile[] getGrid() {
+	public List<NumberTile> getGrid() {
 		//return grid;
-		return grid2;
+		return grid;
 	}
 /*	
 	public List<Boolean> getHits() {

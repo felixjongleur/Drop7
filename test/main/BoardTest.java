@@ -35,18 +35,18 @@ public class BoardTest {
 	
 	@Test
 	public void testBoard() throws FileNotFoundException {		
-		//assertEquals(49, board.getGrid().size());
-		assertEquals(49, board.getGrid().length);
+		assertEquals(49, board.getGrid().size());
+		//assertEquals(49, board.getGrid().length);
 		
 		// First 6 Rows are empty
 		for(int pos = 0; pos < 42; pos++)
-			assertNull(board.getGrid()[pos]);
-			//assertNull(board.getGrid().get(pos));
+			//assertNull(board.getGrid()[pos]);
+			assertNull(board.getGrid().get(pos));
 		
 		// Last Row contains 7 tiles
 		for(int pos = 42; pos < 49; pos++)
-			assertNotNull(board.getGrid()[pos]);
-		//	assertNotNull(board.getGrid().get(pos));
+			//assertNotNull(board.getGrid()[pos]);
+			assertNotNull(board.getGrid().get(pos));
 
 	//	for(boolean hit : board.getHits())
 	//		assertFalse(hit);
@@ -149,7 +149,6 @@ public class BoardTest {
 
 		NumberTile nt  = b.getNumberTile(1, 1, 3, 0);
 		NumberTile nt2 = b.getNumberTile(1, 6, 3, 0);
-		
 		b.setCurrentTile(nt);
 		
 		List<NumberTile> firstColumn = new ArrayList<NumberTile>();
@@ -162,9 +161,9 @@ public class BoardTest {
 		assertEquals(1, firstColumn.size());
 		
 		b.setNumberTile(nt.getX(), nt.getY(), nt.getValue(), nt.getUnknown());
-				
+
 		b.dropColumn(1);
-		
+
 		firstColumn = new ArrayList<NumberTile>();
 		
 		for(int y = 1; y < 8; y++) {
@@ -960,12 +959,12 @@ public class BoardTest {
 	}
 	
 	private void clearBoard(Board b) {
-		for(int pos = 0; pos < b.getGrid().length; pos++) {
+	/*	for(int pos = 0; pos < b.getGrid().length; pos++) {
 			b.getGrid()[pos] = null;
-		}
+		}*/
 		
-/*		for(int y = 1; y < 8; y++)
+		for(int y = 1; y < 8; y++)
 			for(int x = 1; x < 8; x++)
-				b.getGrid().set(b.getNumberTileLocation(x, y), null);*/
+				b.getGrid().set(b.getNumberTileLocation(x, y), null);
 	}
 }
