@@ -11,9 +11,6 @@ public class AI {
 	private Tree<Triplet> moves;
 	private static HashMap<Integer, Integer> posAndScore;
 
-	static private int numOfThreads = 0;
-	static int getResultsFromThread = 0;
-
 	StopWatch a1 = new StopWatch();
 	
 	static int counter = 0;
@@ -32,16 +29,19 @@ public class AI {
 	}
 
 	private int getBestMove(Node<Triplet> root) {
-		a1.start();
+
+		if(MainWindow.debug)
+			a1.start();
+		
 		int bestPos = 0;
 		int bestScore = 0;
 		for (int pos = 1; pos < 8; pos++) {
-			if (root.data.grid.getNumberTileAtLocation(pos, 1) == null) {
-				Board currentGrid = new Board(root.data.grid);
+			if (root.getData().getGrid().getNumberTileAtLocation(pos, 1) == null) {
+				Board currentGrid = new Board(root.getData().getGrid());
+				currentGrid.getDropSequence().add(pos);
 				currentGrid.getCurrentTile().setX(pos);
 				if (currentGrid.pieceHasBeenReleased()) {
-					root.addChild(new Node<Triplet>(new Triplet(pos,
-							currentGrid.getScore(), currentGrid)));
+					root.addChild(new Node<Triplet>(new Triplet(pos, currentGrid.getScore(), currentGrid)));
 				}
 			}
 		}
@@ -52,7 +52,6 @@ public class AI {
 		for (Node<Triplet> triplet : root.getChildren()) {
 			MaxScoreThread mst = new MaxScoreThread(triplet, MainWindow.maxDepth);
 			threads.add(mst);
-			numOfThreads++;
 			mst.start();
 		}
 
@@ -68,16 +67,17 @@ public class AI {
 
 		for (Entry<Integer, Integer> entry : posAndScore.entrySet()) {
 			if(MainWindow.debug)
-			System.out.println("POS[" + entry.getKey() + "] => " + entry.getValue());
+				System.out.println("POS[" + entry.getKey() + "] => " + entry.getValue());
 			if (entry.getValue() > bestScore) {
 				bestScore = entry.getValue();
 				bestPos = entry.getKey();
 			}
 		}
-		a1.stop();
-		t1 += a1.getElapsedTime();
-		counter++;
+		
 		if(MainWindow.debug) {
+			a1.stop();
+			t1 += a1.getElapsedTime();
+			counter++;
 			System.out.println("T1 = " + t1 + " / " + counter + " = " + (t1 / counter));
 			System.out.println("T1 = " + Board.t1 + " / " + Board.n1 + " = " + (Board.t1 / Board.n1));
 			System.out.println("T2 = " + Board.t2 + " / " + Board.n2 + " = " + (Board.t2 / Board.n2));
@@ -85,12 +85,11 @@ public class AI {
 			System.out.println("T4 = " + Board.t4 + " / " + Board.n4 + " = " + (Board.t4 / Board.n4));
 			System.out.println("T5 = " + Board.t5);
 		}
+		
 		return bestPos;
 	}
 
 	static synchronized void getResultsFromThreads(int position, int score) {
-		getResultsFromThread++;
-		numOfThreads--;
 		posAndScore.put(position, score);
 	}
 }

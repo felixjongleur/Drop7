@@ -1,9 +1,9 @@
 package main;
 
 public class Triplet {
-	Integer pos;
-	Integer score;
-	Board grid;
+	private Integer pos;
+	private Integer score;
+	private Board grid;
 
 	public Triplet(Integer pos, Integer score, Board grid) {
 		this.pos = pos;
@@ -11,6 +11,18 @@ public class Triplet {
 		this.grid = grid;
 	}
 
+	public int getPos() {
+		return pos;
+	}
+	
+	public int getScore() {
+		return score;
+	}
+	
+	public Board getGrid() {
+		return grid;
+	}
+	
 	@Override
 	public String toString() {
 		return "[" + pos + " , " + score + " , " + grid.getCurrentTile()

@@ -21,10 +21,6 @@ public class AIThread extends Thread {
 
 		bestPos = ai.getBestMove();
 		System.out.println(bestPos);
-		// System.out.println("getNumberTile = " + Grid.getNumberTile);
-		// System.out.println("getMultiplierToScore = " +
-		// Grid.getMultiplierToScore);
-
 		done = true;
 	}
 

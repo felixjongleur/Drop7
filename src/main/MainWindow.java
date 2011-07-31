@@ -22,18 +22,19 @@ public class MainWindow extends Applet implements MouseListener,
 
 	private Graphics backg;
 
-	private int mx, my; // the most recently recorded mouse coordinates
+	private int mx, my;
 
-	private int width = 400; // width in # of cells
-	private int height = 400; // height in # of cells
+	private int width = 400;
+	private int height = 400;
 
-	static int maxDepth = 7;
+	static int maxDepth = 9;
 	private boolean ai = true;
 	private boolean aiLoop = true;
 	private boolean newGame = true;
 	private boolean loadSequence = false;
-	private String loadFileName = "firstSequence91.txt";
+	private String loadFileName = "firstSequence92.txt";
 	private boolean loadSequenceLoop = false;
+	private String levelFileName = "depth92.txt";
 	static boolean debug = false;
 
 	private static Image blank;
@@ -44,7 +45,7 @@ public class MainWindow extends Applet implements MouseListener,
 
 	@Override
 	public void init() {
-		setSize(width, height); // set size of the sketch
+		setSize(width, height);
 
 		setLayout(null);
 		setBackground(Color.darkGray);
@@ -56,7 +57,7 @@ public class MainWindow extends Applet implements MouseListener,
 		backg = backBuffer.getGraphics();
 
 		try {
-			currentGrid = new Board(newGame, loadSequence, loadSequenceLoop, loadFileName);
+			currentGrid = new Board(newGame, loadSequence, loadSequenceLoop, loadFileName, levelFileName);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -109,23 +110,15 @@ public class MainWindow extends Applet implements MouseListener,
 			repaint();
 
 			if (ai) {
-				aiThread = new AIThread(currentGrid);
+				aiThread = new AIThread(new Board(currentGrid));
 				aiThread.start();
 			}
 
 			while (aiLoop) {
 				if (aiThread.done) {
-					
 					currentGrid.getCurrentTile().setX(aiThread.getBestPos());
 					currentGrid.pieceHasBeenReleased();
-					
-					if(currentGrid.getLevel() == 2) {
-						aiLoop = false;
-						currentGrid.printBoardForFile();
-						System.out.println("AI COUNTER = " + AI.counter);
-					}
-					
-					aiThread = new AIThread(currentGrid);
+					aiThread = new AIThread(new Board(currentGrid));
 					aiThread.start();
 				}
 			}
@@ -145,16 +138,16 @@ public class MainWindow extends Applet implements MouseListener,
 		}
 		e.consume();
 	}
+	
+	public Board getCurrentGrid() {
+		return currentGrid;
+	}
 
 	@Override
 	public void update(Graphics g) {
 		paint(g);
 	}
-
-	public Board getCurrentGrid() {
-		return currentGrid;
-	}
-
+	
 	@Override
 	public void paint(Graphics g) {
 		backg.clearRect(0, 0, width, height);
