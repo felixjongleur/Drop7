@@ -11,9 +11,6 @@ import javax.imageio.ImageIO;
 
 public class NumberTile extends Applet {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -9201610917002522400L;
 	private int x, y;
 	private int drawX, drawY;

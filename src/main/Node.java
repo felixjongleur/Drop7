@@ -10,8 +10,8 @@ import java.util.List;
  */
 public class Node<T> {
 
-	public T data;
-	public List<Node<T>> children;
+	private T data;
+	private List<Node<T>> children;
 
 	/**
 	 * Default ctor.

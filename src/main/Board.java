@@ -24,7 +24,6 @@ public class Board {
 	static List<NumberTile> userPieces;
 	static List<NumberTile> rows;
 
-
 	static List<Integer> sequence;
 	static Map<Integer, Integer> multiplierToScore;
 	static Map<Integer, NumberTile> allNumberTiles;
@@ -33,9 +32,9 @@ public class Board {
 	private boolean sequenceLoop = false;
 
 	private Boolean[] hits;
-	private List<NumberTile> grid;
-	//private NumberTile[] grid;
-	
+	private NumberTile[] grid;
+	private List<Integer> dropSequence;
+
 	StopWatch g1 = new StopWatch();
 	StopWatch g2 = new StopWatch();
 	StopWatch g3 = new StopWatch();
@@ -45,24 +44,21 @@ public class Board {
 	static long t1 = 0, t2 = 0, t3 = 0, t4 = 0, t5 = 0;
 	static long n1 = 0, n2 = 0, n3 = 0, n4 = 0, n5 = 0;
 
-	private int maxMultiplier = 22;
-	
+	private int maxMultiplier = 0;
+	private int boardCleared = 0;
+
 	public Board() throws FileNotFoundException {
-		this(true, false, false, "");
+		this(true, false, false, "", "");
 	}
-	
-	public Board(boolean newGame, boolean loadSequence, boolean sequenceLoop, String loadFileName)
+
+	public Board(boolean newGame, boolean loadSequence, boolean sequenceLoop,
+			String loadFileName, String levelFileName)
 			throws FileNotFoundException {
-		grid = new ArrayList<NumberTile>();
-	//	grid = new NumberTile[49];
+
+		grid = new NumberTile[49];
 		hits = new Boolean[49];
-		
-		for (int y = 1; y < 8; y++) {
-			for (int x = 1; x < 8; x++) {
-				grid.add(null);
-			}
-		}
-	 
+		dropSequence = new ArrayList<Integer>();
+
 		if (userPieces == null)
 			loadUserPieces();
 		if (rows == null)
@@ -73,57 +69,34 @@ public class Board {
 			loadAllNumberTiles();
 		if (loadSequence && sequence == null)
 			loadSequence(loadFileName, sequenceLoop);
+		else
+			sequence = new ArrayList<Integer>();
 
 		if (newGame)
 			levelUp();
 		else
-			loadLevel();
+			loadLevel(levelFileName);
 	}
 
 	public Board(Board g) {
-		g1.start();
-		grid = new ArrayList<NumberTile>();
-	//	grid = new NumberTile[49];
-		g1.stop();
-		n1++;
-		t1 += g1.getElapsedTime();
-		
-		g2.start();
-	/*	for(int pos = 0; pos < 49; pos++) {
-			if(g.getGrid()[pos] != null) {
-				getGrid()[pos] = getNumberTile(g.getGrid()[pos].getX(), g.getGrid()[pos].getY(),
-						g.getGrid()[pos].getValue(), g.getGrid()[pos].getUnknown());
-			}
-		}	*/	
-		
-		for (int pos = 0; pos < g.grid.size(); pos++) {
-			if (g.grid.get(pos) == null) {
-				grid.add(null);
-			} else {
-				grid.add(getNumberTile(g.grid.get(pos).getX(), g.grid.get(pos).getY(),
-						g.grid.get(pos).getValue(), g.grid.get(pos).getUnknown()));
+		grid = new NumberTile[49];
+
+		for (int pos = 0; pos < 49; pos++) {
+			if (g.getGrid()[pos] != null) {
+				NumberTile nt = g.getGrid()[pos];
+				getGrid()[pos] = getNumberTile(nt.getX(), nt.getY(), nt.getValue(), nt.getUnknown());
 			}
 		}
-		g2.stop();
-		n2++;
-		t2 += g2.getElapsedTime();
 
-		g3.start();
 		hits = new Boolean[49];
-		g3.stop();
-		n3++;
-		t3 += g3.getElapsedTime();
 
 		this.level = g.level;
 		this.turnsLeft = g.turnsLeft;
 		this.currentPieceIndex = g.currentPieceIndex;
 		this.raisingIndex = g.raisingIndex;
 		this.score = g.score;
-		g4.start();
+		this.dropSequence = new ArrayList<Integer>(g.dropSequence);
 		this.currentTile = getNumberTile(1, 1, g.currentTile.getValue(), g.currentTile.getUnknown());
-		g4.stop();
-		n4++;
-		t4 += g4.getElapsedTime();
 	}
 
 	private void loadSequence(String fileName, boolean sequenceLoop) throws FileNotFoundException {
@@ -182,7 +155,6 @@ public class Board {
 			}
 		}
 		userPieces = Collections.unmodifiableList(temp);
-//		System.out.println(userPieces.size());
 	}
 
 	private void loadLevelRows() throws FileNotFoundException {
@@ -198,44 +170,9 @@ public class Board {
 		}
 		rows = Collections.unmodifiableList(temp);
 	}
-	
-	public void setNumberTile(int x, int y, int value, int unknown) {
-	/*	if(value == 0)
-			grid[getNumberTileLocation(x, y)] = null;
-		else
-			grid[getNumberTileLocation(x, y)] = getNumberTile(x, y, value, unknown);*/
-		if(value == 0)
-			grid.set(getNumberTileLocation(x, y), null);
-		else
-			grid.set(getNumberTileLocation(x, y), getNumberTile(x, y, value, unknown));
-	}
-	
-	public boolean getHitAt(int x, int y) {
-		if(hits[getNumberTileLocation(x, y)] == null)
-			return false;
-		else
-			return true;
-	//	return hits.get(getNumberTileLocation(x, y));
-	}
-	
-	public NumberTile getNumberTile(int x, int y, int value, int unknown) {
-		int posInGrid = ((x - 1) + (y - 1) * 7);
-		int offSet = posInGrid * 21;
-		int innerValue = 0;
 
-		if (unknown == 0) {
-			innerValue = value - 1;
-		} else if (unknown == 1) {
-			innerValue = value + 6;
-		} else {
-			innerValue = value + 13;
-		}
-		// System.out.println("GET = " + (innerValue + offSet));
-		return allNumberTiles.get(innerValue + offSet);
-	}
-
-	public void loadLevel() throws FileNotFoundException {
-		Scanner scanner = new Scanner(new File("files", "depth92.txt"));
+	public void loadLevel(String fileName) throws FileNotFoundException {
+		Scanner scanner = new Scanner(new File("files", fileName));
 		String str;
 		while (scanner.hasNext()) {
 			str = scanner.next();
@@ -255,36 +192,54 @@ public class Board {
 						str = scanner.next();
 						if (!str.equals("-")) {
 							int value = Integer.parseInt(str.substring(0, 1));
-			//				int location = getNumberTileLocation(x, y);
 							if (str.length() == 1) {
 								setNumberTile(x, y, value, 0);
-							//	grid.set(location, new NumberTile(x, y, value, 0));
 							} else if (str.length() == 2) {
 								setNumberTile(x, y, value, 1);
-							//	grid.set(location, new NumberTile(x, y, value, 1));
 							} else if (str.length() == 3) {
 								setNumberTile(x, y, value, 2);
-								//grid.set(location, new NumberTile(x, y, value, 2));
 							}
 						}
 					}
 				}
 			}
 		}
-		System.out.println(level);
-		System.out.println(turnsLeft);
-		System.out.println(score);
-		System.out.println(currentPieceIndex);
-		System.out.println(raisingIndex);
-
 		currentTile = nextFallingPiece();
-		// if(MainWindow.debug)
-		// printOutBoard();
+	}
+
+	public void setNumberTile(int x, int y, int value, int unknown) {
+		if (value == 0)
+			grid[getNumberTileLocation(x, y)] = null;
+		else
+			grid[getNumberTileLocation(x, y)] = getNumberTile(x, y, value,
+					unknown);
+	}
+
+	public NumberTile getNumberTile(int x, int y, int value, int unknown) {
+		int posInGrid = ((x - 1) + (y - 1) * 7);
+		int offSet = posInGrid * 21;
+		int innerValue = 0;
+
+		if (unknown == 0) {
+			innerValue = value - 1;
+		} else if (unknown == 1) {
+			innerValue = value + 6;
+		} else {
+			innerValue = value + 13;
+		}
+		return allNumberTiles.get(innerValue + offSet);
+	}
+
+	public boolean getHitAt(int x, int y) {
+		if (hits[getNumberTileLocation(x, y)] == null)
+			return false;
+		else
+			return true;
 	}
 
 	public boolean levelUp() {
 		level++;
-		
+
 		for (int x = 1; x < 8; x++) {
 			// Check Top Row For Openings
 			if (getNumberTileAtLocation(x, 1) != null)
@@ -294,15 +249,11 @@ public class Board {
 				NumberTile nt = getNumberTileAtLocation(x, y);
 				if (nt != null) {
 					setNumberTile(x, y - 1, nt.getValue(), nt.getUnknown());
-			//		int location = getNumberTileLocation(x, y - 1);
-			//		grid.set(location, getNumberTile(x, y - 1, nt.getValue(), nt.getUnknown()));
 				}
 			}
 			// Add In New Row
 			NumberTile nt = nextRaisingPiece();
 			setNumberTile(x, 7, nt.getValue(), nt.getUnknown());
-		//	int location = getNumberTileLocation(x, 7);
-		//	grid.set(location, getNumberTile(x, 7, nt.getValue(), nt.getUnknown()));
 		}
 
 		// Update Board
@@ -321,40 +272,40 @@ public class Board {
 			explodeHits();
 			dropAllColumns();
 
-			if (gridIsEmpty())
+			if (gridIsEmpty()) {
 				score += 70000;
+				boardCleared++;
+			}
 		}
 	}
 
 	public void doSequence() {
 		if (sequenceIndex < sequence.size()) {
-			System.out.println(sequence.get(sequenceIndex));
-			// System.out.println(currentGrid.currentTile);
-			// System.out.println(currentGrid.currentPieceIndex);
 			currentTile.setX(nextSequenceColumn());
 		} else {
 			System.out.println("#level " + level);
 			System.out.println("#turnsLeft " + turnsLeft);
 			System.out.println("#score " + score);
-			System.out.println("#currentPieceIndex " + (currentPieceIndex - 1));
+			System.out.println("#currentPieceIndex " + currentPieceIndex);
+			//System.out.println("#currentPieceIndex " + (currentPieceIndex - 1));
 			System.out.println("#raisingIndex " + raisingIndex);
 			System.out.println("#grid");
 			printBoardForFile();
 		}
 	}
-	
+
 	public boolean pieceHasBeenReleased() {
-		if (sequenceLoaded)
+		if (sequenceLoaded && sequenceIndex < sequence.size() + 1)
 			doSequence();
 
 		if (getNumberTileAtLocation(currentTile.getX(), 1) == null) {
 			int x = currentTile.getX();
-			setNumberTile(x, 1, currentTile.getValue(), currentTile.getUnknown());
+			setNumberTile(x, 1, currentTile.getValue(),
+					currentTile.getUnknown());
 
 			turnsLeft--;
 			currentTile = null;
 			multiplier = 0;
-
 			dropColumn(x);
 			burnDown();
 
@@ -366,7 +317,7 @@ public class Board {
 				currentTile = nextFallingPiece();
 			}
 
-			if(sequenceLoop && sequenceIndex < sequence.size())
+			if (sequenceLoop && sequenceIndex < sequence.size() + 1)
 				pieceHasBeenReleased();
 			
 			return true;
@@ -375,22 +326,15 @@ public class Board {
 	}
 
 	public boolean gridIsEmpty() {
-	/*	for(int pos = 0; pos < grid.length; pos++) {
-			if(grid[pos] != null)
-				return false;
-		}
-		return true;*/
-		
-		for (NumberTile nt : grid) {
-			if (nt != null)
+		for (int pos = 0; pos < grid.length; pos++) {
+			if (grid[pos] != null)
 				return false;
 		}
 		return true;
 	}
 
 	public NumberTile getNumberTileAtLocation(int x, int y) {
-	//	return grid[(x - 1) + (y - 1) * 7];
-		return grid.get((x - 1) + (y - 1) * 7);
+		return grid[(x - 1) + (y - 1) * 7];
 	}
 
 	public int getNumberTileLocation(int x, int y) {
@@ -402,35 +346,36 @@ public class Board {
 			for (int x = 1; x < 8; ++x) {
 				int location = getNumberTileLocation(x, y);
 				if (hits[location] != null) {
-				//if (hits.get(location)) {
-					//hits.set(location, false);
 					hits[location] = null;
-				//	grid[location] = null;
-					grid.set(location, null);
+					grid[location] = null;
 					addToScore();
 					// Check Up
 					if (y > 1) {
 						NumberTile nt = getNumberTileAtLocation(x, y - 1);
-						if (nt != null && nt.getUnknown() > 0)							
-							setNumberTile(x, y - 1, nt.getValue(), nt.getUnknown() - 1);
+						if (nt != null && nt.getUnknown() > 0)
+							setNumberTile(x, y - 1, nt.getValue(),
+									nt.getUnknown() - 1);
 					}
 					// Check Down
 					if (y < 7) {
 						NumberTile nt = getNumberTileAtLocation(x, y + 1);
 						if (nt != null && nt.getUnknown() > 0)
-							setNumberTile(x, y + 1, nt.getValue(), nt.getUnknown() - 1);
+							setNumberTile(x, y + 1, nt.getValue(),
+									nt.getUnknown() - 1);
 					}
 					// Check Left
 					if (x > 1) {
 						NumberTile nt = getNumberTileAtLocation(x - 1, y);
 						if (nt != null && nt.getUnknown() > 0)
-							setNumberTile(x - 1, y, nt.getValue(), nt.getUnknown() - 1);
+							setNumberTile(x - 1, y, nt.getValue(),
+									nt.getUnknown() - 1);
 					}
 					// Check Right
 					if (x < 7) {
 						NumberTile nt = getNumberTileAtLocation(x + 1, y);
 						if (nt != null && nt.getUnknown() > 0)
-							setNumberTile(x + 1, y, nt.getValue(), nt.getUnknown() - 1);
+							setNumberTile(x + 1, y, nt.getValue(),
+									nt.getUnknown() - 1);
 					}
 				}
 			}
@@ -452,7 +397,6 @@ public class Board {
 				if (temp != null && temp.getUnknown() == 0
 						&& temp.getValue() == numberOfTilesInColumn) {
 					hits[getNumberTileLocation(x, y)] = true;
-					//hits.set(getNumberTileLocation(x, y), true);
 					hit = true;
 				}
 			}
@@ -479,7 +423,6 @@ public class Board {
 						if (temp != null && temp.getUnknown() == 0
 								&& temp.getValue() == numberOfTiles) {
 							hits[getNumberTileLocation(pos, y)] = true;
-							//hits.set(getNumberTileLocation(pos, y), true);
 							hit = true;
 						}
 					}
@@ -493,7 +436,6 @@ public class Board {
 						if (temp != null && temp.getUnknown() == 0
 								&& temp.getValue() == numberOfTiles) {
 							hits[getNumberTileLocation(pos, y)] = true;
-							//hits.set(getNumberTileLocation(pos, y), true);
 							hit = true;
 						}
 					}
@@ -504,29 +446,21 @@ public class Board {
 	}
 
 	public void dropColumn(int x) {
-		// printOutBoard();
-
 		int y1 = 7;
 
 		for (int y2 = 7; y2 >= 1; --y2) {
 			if (getNumberTileAtLocation(x, y2) != null) {
 				if (y1 != y2) {
-				//	int newLocation = getNumberTileLocation(x, y1);
 					NumberTile nt = getNumberTileAtLocation(x, y2);
 					setNumberTile(x, y1, nt.getValue(), nt.getUnknown());
-					//grid.set(newLocation, getNumberTile(x, y1, nt.getValue(), nt.getUnknown()));
 				}
 				--y1;
 			}
 		}
 
 		for (; y1 >= 1; --y1) {
-			//int newLocation = getNumberTileLocation(x, y1);
-			//grid.set(newLocation, null);
 			setNumberTile(x, y1, 0, 0);
 		}
-
-		// printOutBoard();
 	}
 
 	private void dropAllColumns() {
@@ -575,7 +509,6 @@ public class Board {
 				} else {
 					System.out.print("  -  ");
 				}
-				// System.out.print("|");
 			}
 			System.out.println();
 		}
@@ -583,13 +516,12 @@ public class Board {
 	}
 
 	public void addToScore() {
-		// System.out.println("Multiplier = "+multiplier);
-		if (multiplier > maxMultiplier)// {
-			System.out.println("NEW HIGH MULTIPLIER FOUND " + multiplier);
-			// maxMultiplier = multiplier;
-	//	} else {
-			score += getMultiplierToScore(multiplier);
-	//	}
+		if (multiplier > maxMultiplier) {
+		//	System.out.println("NEW HIGH MULTIPLIER FOUND " + multiplier);
+		//	System.out.println(dropSequence);
+			maxMultiplier = multiplier;
+		}
+		score += getMultiplierToScore(multiplier);
 	}
 
 	public int getMultiplierToScore(int multiplier) {
@@ -607,7 +539,7 @@ public class Board {
 	private int nextSequenceColumn() {
 		return getColumn(sequence, sequenceIndex++);
 	}
-	
+
 	private NumberTile getNumberTile(List<NumberTile> list, int index) {
 		return list.get(index);
 	}
@@ -619,7 +551,7 @@ public class Board {
 	public NumberTile getCurrentTile() {
 		return currentTile;
 	}
-	
+
 	public void setCurrentTile(NumberTile currentTile) {
 		this.currentTile = currentTile;
 	}
@@ -628,15 +560,10 @@ public class Board {
 		return score;
 	}
 
-	public List<NumberTile> getGrid() {
-		//return grid;
+	public NumberTile[] getGrid() {
 		return grid;
 	}
-/*	
-	public List<Boolean> getHits() {
-		return hits;
-	}
-*/
+	
 	public int getLevel() {
 		return level;
 	}
@@ -652,7 +579,7 @@ public class Board {
 	public void setMultiplier(int m) {
 		multiplier = m;
 	}
-	
+
 	public int getCurrentPieceIndex() {
 		return currentPieceIndex;
 	}
@@ -677,6 +604,10 @@ public class Board {
 		return sequence;
 	}
 
+	public List<Integer> getDropSequence() {
+		return dropSequence;
+	}
+
 	public static Map<Integer, Integer> getMultiplierToScore() {
 		return multiplierToScore;
 	}
@@ -687,5 +618,9 @@ public class Board {
 
 	public int getMaxMultiplier() {
 		return maxMultiplier;
+	}
+
+	public int getBoardCleared() {
+		return boardCleared;
 	}
 }
