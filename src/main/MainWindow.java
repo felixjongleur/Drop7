@@ -27,7 +27,7 @@ public class MainWindow extends Applet implements MouseListener,
 	private int width = 400;
 	private int height = 400;
 
-	static int maxDepth = 8;
+	static int maxDepth = 6;
 	private boolean ai = true;
 	private boolean newGame = true;
 	private boolean loadSequence = false;
