@@ -319,7 +319,7 @@ public class Board {
 
 			if (sequenceLoop && sequenceIndex < sequence.size() + 1)
 				pieceHasBeenReleased();
-			
+
 			return true;
 		}
 		return false;
